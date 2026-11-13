@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DFK Game SDK Demo</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="top">
+      <div class="brand">
+        <h1>DFK Game SDK</h1>
+        <p>Everything below is read live from chain by <code>@defikingdoms/game-sdk</code>.</p>
+      </div>
+      <form id="chain-form" class="chain">
+        <label>
+          Chain
+          <select id="chain"></select>
+        </label>
+        <label class="rpc">
+          RPC <span class="muted">(optional)</span>
+          <input id="rpc" placeholder="Public RPC" spellcheck="false" />
+        </label>
+        <button type="submit">Use</button>
+      </form>
+    </header>
+
+    <nav class="tabs" id="tabs" role="tablist">
+      <button role="tab" data-tab="hero">Hero</button>
+      <button role="tab" data-tab="creator">Hero creator</button>
+      <button role="tab" data-tab="wallet">Wallet</button>
+      <button role="tab" data-tab="market">Market</button>
+      <button role="tab" data-tab="catalog">Pet catalog</button>
+      <button role="tab" data-tab="actions">Actions</button>
+    </nav>
+
+    <main>
+      <section id="tab-hero" class="tab">
+        <form class="bar" id="hero-form">
+          <input id="hero-id" placeholder="Hero id" spellcheck="false" />
+          <label>
+            Art
+            <select id="hero-art">
+              <option value="local">Classic layers</option>
+              <option value="generator">Hero generator (armor &amp; accessories)</option>
+            </select>
+          </label>
+          <button>Load hero</button>
+          <span class="hint">Reads <code>dfk.heroes.get</code>, <code>dfk.equipment.forHero</code> and <code>dfk.pets.get</code>.</span>
+        </form>
+        <div id="hero-out"></div>
+      </section>
+
+      <section id="tab-creator" class="tab">
+        <p class="hint">Pick every visual gene, the class and the gear. Drawn in your browser by <code>HeroRenderer</code>; no RPC needed.</p>
+        <div id="creator-out"></div>
+      </section>
+
+      <section id="tab-wallet" class="tab">
+        <form class="bar" id="wallet-form">
+          <input id="wallet-address" placeholder="0x… address" spellcheck="false" />
+          <button>Load wallet</button>
+          <span class="hint">Heroes, pets, equipment, items and tokens in a handful of multicalls.</span>
+        </form>
+        <div id="wallet-out"></div>
+      </section>
+
+      <section id="tab-market" class="tab">
+        <form class="bar" id="market-form">
+          <select id="market">
+            <option value="heroes">Heroes</option>
+            <option value="pets">Pets</option>
+            <option value="weapons">Weapons</option>
+            <option value="armor">Armor</option>
+            <option value="accessories">Accessories</option>
+          </select>
+          <label class="inline">Look back <input id="lookback" type="number" min="1000" step="1000" value="20000" /> blocks</label>
+          <button name="kind" value="listings">Open listings</button>
+          <button name="kind" value="sales">Recent sales</button>
+        </form>
+        <p class="hint">Read straight from the auction contracts' event logs, which replace the retired DFK indexer API.</p>
+        <div id="market-out"></div>
+      </section>
+
+      <section id="tab-catalog" class="tab">
+        <form class="bar" id="catalog-form">
+          <select id="catalog-egg">
+            <option value="">All eggs</option>
+            <option value="0">Blue (fishing)</option>
+            <option value="1">Grey (foraging)</option>
+            <option value="2">Green (gardening)</option>
+          </select>
+          <input id="catalog-search" placeholder="Filter by name or family" spellcheck="false" />
+          <label class="inline"><input type="checkbox" id="catalog-scene" checked /> Scenery</label>
+        </form>
+        <p class="hint">Every pet appearance from <code>PET_CATALOG</code>, animated by <code>PetRenderer</code>. No RPC needed.</p>
+        <div id="catalog-out" class="grid pets"></div>
+      </section>
+
+      <section id="tab-actions" class="tab">
+        <div class="notice">
+          These buttons send real transactions from your browser wallet on the selected chain. Your wallet asks you to
+          confirm each one.
+        </div>
+        <div class="bar">
+          <button id="connect">Connect wallet</button>
+          <span id="account" class="muted">Not connected</span>
+        </div>
+        <div class="actions" id="actions"></div>
+        <div id="action-log" class="log"></div>
+      </section>
+    </main>
+
+    <footer>
+      Hero renders and art are served by DeFi Kingdoms. Source: <code>demo/main.ts</code>.
+    </footer>
+    <script type="module" src="dist/main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DFK Hero Viewer</title>
+    <style>
+      body { font-family: system-ui, sans-serif; background: #15120f; color: #f3ead8; margin: 24px; }
+      canvas { width: 228px; height: 212px; image-rendering: pixelated; display: block; }
+      button { margin: 4px 4px 0 0; }
+    </style>
+    <!-- No bundler: map bare imports to CDN builds. -->
+    <script type="importmap">
+      {
+        "imports": {
+          "@defikingdoms/game-sdk": "https://esm.sh/@defikingdoms/game-sdk?deps=ethers@5.8.0",
+          "@defikingdoms/game-sdk/renderer": "https://esm.sh/@defikingdoms/game-sdk/renderer?deps=ethers@5.8.0"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <form id="form"><input id="heroId" value="2000000000001" /> <button>Load hero</button></form>
+    <h2 id="name"></h2>
+    <canvas id="hero"></canvas>
+    <div id="actions"></div>
+
+    <script type="module">
+      import { ChainId, createDFKClient } from '@defikingdoms/game-sdk'
+      import { HeroRenderer, HERO_ANIMATIONS, getDefaultHeroAnimation, professionAnimation } from '@defikingdoms/game-sdk/renderer'
+
+      const dfk = createDFKClient({ chainId: ChainId.KAIA_MAINNET })
+      const canvas = document.getElementById('hero')
+      let renderer
+
+      async function show(id) {
+        const hero = await dfk.heroes.get(id)
+        if (!hero) return (document.getElementById('name').textContent = 'Hero not found')
+        document.getElementById('name').textContent = `${hero.name} · Lv ${hero.level} ${hero.class}`
+        renderer?.destroy()
+        renderer = new HeroRenderer(canvas, hero)
+        await renderer.ready
+
+        const actions = document.getElementById('actions')
+        actions.replaceChildren()
+        for (const [label, anim] of [
+          ['Idle', getDefaultHeroAnimation(hero)],
+          ['Walk', HERO_ANIMATIONS.overworldWalk],
+          ['Fish', professionAnimation('fishing')],
+          ['Hurt', HERO_ANIMATIONS.hurt],
+        ]) {
+          const b = document.createElement('button')
+          b.textContent = label
+          b.onclick = () => (anim === HERO_ANIMATIONS.hurt ? renderer.playOnce(anim) : renderer.play(anim))
+          actions.append(b)
+        }
+      }
+
+      document.getElementById('form').onsubmit = e => {
+        e.preventDefault()
+        show(document.getElementById('heroId').value)
+      }
+      show(document.getElementById('heroId').value)
+    </script>
+  </body>
+</html>
